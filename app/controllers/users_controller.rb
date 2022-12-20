@@ -1,4 +1,5 @@
 class UsersController < ApplicationController
+  before_action :ensure_current_user, {only: [:edit, :update]}
   
   def create
     @book = Book.new(book_params)
@@ -19,11 +20,24 @@ class UsersController < ApplicationController
   end
 
   def edit
+    @user = current_user
+  end
+  
+  def update
+    @user = User.find(params[:id])
+    @user.update(user_params)
+    flash[:notice] = "You have updated user successfully."
+    redirect_to books_path(@user.id)
   end
   
   private
 
   def user_params
-    params.require(:user).permit(:name, :introduction)
+    params.require(:user).permit(:name, :profile_image, :introduction)
+  end
+  def ensure_current_user
+  if current_user.id != params[:id].to_i
+    redirect_to user_path(current_user)
+  end
   end
 end

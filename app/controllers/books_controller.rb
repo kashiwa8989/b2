@@ -6,8 +6,12 @@ class BooksController < ApplicationController
   def create
     @book = Book.new(book_params)
     @book.user = current_user
-    @book.save
-    redirect_to books_path(@book)
+    if @book.save
+      flash[:notice] = "You have created book successfully."
+      redirect_to books_path(@book)
+    else
+      render file: "/books/index"
+    end
   end
 
   def index
@@ -35,6 +39,7 @@ class BooksController < ApplicationController
   def update
     @book = Book.find(params[:id])
     @book.update(book_params)
+    flash[:notice] = "You have updated book successfully."
     redirect_to book_path(@book.id)
   end
 
